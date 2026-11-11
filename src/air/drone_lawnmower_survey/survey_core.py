@@ -53,12 +53,22 @@ def translate_path(path, offset_x=0.0, offset_y=0.0, offset_z=0.0):
     ]
 
 
+def _finite_point(name, point):
+    try:
+        coordinates = tuple(float(value) for value in point)
+    except (TypeError, ValueError):
+        raise ValueError("%s must contain three finite coordinates" % name)
+    if len(coordinates) != 3 or not all(math.isfinite(value) for value in coordinates):
+        raise ValueError("%s must contain three finite coordinates" % name)
+    return coordinates
+
+
 def path_length(path, start=None):
     """Calculate the 3D length of a waypoint sequence."""
 
-    points = list(path)
+    points = [_finite_point("waypoint", point) for point in path]
     if start is not None:
-        points.insert(0, start)
+        points.insert(0, _finite_point("start", start))
     return sum(
         math.sqrt(
             (current[0] - previous[0]) ** 2

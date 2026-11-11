@@ -58,6 +58,17 @@ class LawnmowerPathTests(unittest.TestCase):
             path_length([(3, 4, 0)], start=(0, 0, 0)), 5.0
         )
 
+    def test_path_length_rejects_invalid_waypoints(self):
+        invalid_points = ((1, 2), (1, 2, 3, 4), (1, math.nan, 3), None)
+        for point in invalid_points:
+            with self.subTest(point=point):
+                with self.assertRaisesRegex(ValueError, "three finite coordinates"):
+                    path_length([(0, 0, 0), point])
+
+    def test_path_length_rejects_invalid_start(self):
+        with self.assertRaisesRegex(ValueError, "three finite coordinates"):
+            path_length([(0, 0, 0)], start=(math.inf, 0, 0))
+
     def test_non_positive_and_non_finite_parameters_are_rejected(self):
         invalid_values = (0, -1, math.nan, math.inf, -math.inf)
         for value in invalid_values:
